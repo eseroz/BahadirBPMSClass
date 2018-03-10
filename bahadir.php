@@ -4,13 +4,15 @@
 //ini_set('display_errors', 1);
 //ini_set('display_startup_errors', 1);
 //error_reporting(E_ALL);
-
+ 
 require_once 'BFunctions.php';
 require_once 'BDatabase.php';
 require_once 'BTriggers.php';
 
 class Bahadir
 {
+
+
     public static $instance;
     public $mysqlDb;
     public $mssqlDb;
