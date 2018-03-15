@@ -11,8 +11,6 @@ require_once 'BTriggers.php';
 
 class Bahadir
 {
-
-
     public static $instance;
     public $mysqlDb;
     public $mssqlDb;
@@ -20,10 +18,15 @@ class Bahadir
 
     function __construct() {
 
-        $mssql_host = "192.168.6.76";
+        //$mssql_host = "192.168.6.76";
+        //$mssql_database = "BahadirBPMS";
+        //$mssql_uid = "sa";
+        //$mssql_password = "Ridahab956230";
+
+        $mssql_host = ".";
         $mssql_database = "BahadirBPMS";
         $mssql_uid = "sa";
-        $mssql_password = "Ridahab956230";
+        $mssql_password = "0000";
         
         $this->mssqlDb = new MSSQL_Database($mssql_host,$mssql_database,$mssql_uid,$mssql_password);
 
