@@ -193,7 +193,7 @@ class MSSQL_Database extends PDO {
         return json_encode($result);
     }
 
-    public function GET_USER_ID($PM_USER_UID, $PM_USERNAME){
+    public function GET_USER_ID($PM_USER_UID){
         $PM_USER = $this->Select("SELECT ID FROM PM_USER WHERE PM_USER_UID = '$PM_USER_UID'");
         if(count($PM_USER) == 0){
             $this->ExecQuery("INSERT INTO PM_USER (PM_USER_UID) VALUES('$PM_USER_UID')");
