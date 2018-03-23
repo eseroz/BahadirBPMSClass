@@ -255,9 +255,8 @@ class BTriggers
 
     public function REFERANS_HAZIRLAMA_SURECI_TALEP_DEGERLENDIR_AFTER($PARENT_MSSQL_CASE_ID, $REFERANS_TALEP_MSSQL_CASE_ID){
 
-        $ATANACAK_KULLANICI_IDLERI = [];
         $bahadir = new Bahadir();
-
+        $ATANACAK_KULLANICI_IDLERI = [];
 
         if($REFERANS_TALEP_MSSQL_CASE_ID > 0){
 
@@ -309,7 +308,7 @@ class BTriggers
                         }
                     }
                 }
-                return $ATANACAK_KULLANICI_IDLERI;
+               return $ATANACAK_KULLANICI_IDLERI;
             }
         }
     }
@@ -330,6 +329,20 @@ class BTriggers
                 $TERMIN_COUNT = $TERMIN_COUNT + count($TERMINLER);
             }
             return $TERMIN_COUNT;
+        }
+    }
+
+    public function REFERANS_HAZIRLAMA_SURECI_TALEP_DEGERLENDIR_AFTER3($PARENT_MSSQL_CASE_ID, $REFERANS_TALEP_MSSQL_CASE_ID){
+     
+        $bahadir = new Bahadir();
+    
+        $MSSQL_CASE_ID = $REFERANS_TALEP_MSSQL_CASE_ID > 0 ? $REFERANS_TALEP_MSSQL_CASE_ID : $PARENT_MSSQL_CASE_ID;
+        $CASES = $bahadir->mssqlDb->Select("SELECT *FROM CASES WHERE ID = $MSSQL_CASE_ID");
+        $REFERANS_TALEP_DEGERLENDIRME_SONUCU = 0;
+
+        foreach ($CASES as $CASE)
+        {
+        	return $CASE["REFERANS_TALEP_DEGERLENDIRME_SONUCU"];
         }
     }
 
