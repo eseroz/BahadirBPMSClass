@@ -41,7 +41,11 @@ class MSSQL_Database extends PDO {
             $rows[$i] = $row;
             $i++;
         }
-        echo odbc_errormsg();
+         if(odbc_errormsg()){
+            error_log("##################################################################################################");
+            error_log($sql);
+            error_log("##################################################################################################");
+        }
         $UTF_8_ROWS = $this->functions->encoding->ARR_WALK_MSSQL_TO_UTF8($rows);
         return $UTF_8_ROWS;
     }
@@ -56,19 +60,19 @@ class MSSQL_Database extends PDO {
         return $return[0]["ID"];
     }
 
-    public function CREATE_MSSQL_NEW_CASE($PROCESS_UID, $PM_CASE_ID, $PM_USER_UID, $PARENT_MSSQL_CASE_ID, $NEW_DOCUMENT_NUMBER = null){
+    public function CREATE_MSSQL_NEW_CASE($PROCESS_UID, $PM_CASE_ID, $CASE_TYPE, $PM_USER_UID, $PARENT_MSSQL_CASE_ID, $NEW_DOCUMENT_NUMBER = null){
         $PM_CRT_IP = $this->functions->GET_CLIENT_IP();
-        $this->ExecQuery("INSERT INTO CASES (PM_PROCESS_UID,PM_CASE_ID,PM_CRT_USER_UID,PM_CRT_IP,CRT_DATE,PARENT_MSSQL_CASE_ID, REQUEST_DOC_NUMBER) VALUES('$PROCESS_UID', $PM_CASE_ID,'$PM_USER_UID','$PM_CRT_IP',GETDATE(),$PARENT_MSSQL_CASE_ID,'$NEW_DOCUMENT_NUMBER')");
+        $this->ExecQuery("INSERT INTO CASES (PM_PROCESS_UID,PM_CASE_ID,PM_CRT_USER_UID,PM_CRT_IP,CRT_DATE,CASE_TYPE,PARENT_MSSQL_CASE_ID, REQUEST_DOC_NUMBER) VALUES('$PROCESS_UID', $PM_CASE_ID, '$PM_USER_UID','$PM_CRT_IP',GETDATE(),'$CASE_TYPE',$PARENT_MSSQL_CASE_ID,'$NEW_DOCUMENT_NUMBER')");
     }
 
-    public function GET_MSSQL_CASE_ID($PROCESS_UID, $PM_CASE_ID, $PM_USER_UID, $CREATE_NEW_CASE_MODE, $PARENT_MSSQL_CASE_ID = 0, $NEW_DOCUMENT_NUMBER = null)
-    {
+    public function GET_MSSQL_CASE_ID($PROCESS_UID, $PM_CASE_ID, $CASE_TYPE, $PM_USER_UID, $CREATE_NEW_CASE_MODE, $PARENT_MSSQL_CASE_ID = 0, $NEW_DOCUMENT_NUMBER = null)
+    {   $CASE_TYPE = $this->functions->encoding->STR_UTF8_TO_MSSQL($CASE_TYPE);
         $MSSQL_CASE_ID = 0;
         $SELECT = $this->Select("SELECT *FROM CASES WHERE PM_PROCESS_UID = '$PROCESS_UID' AND PM_CASE_ID = $PM_CASE_ID");
         if(count($SELECT) == 0){
             if($CREATE_NEW_CASE_MODE == TRUE){
-                $this->CREATE_MSSQL_NEW_CASE($PROCESS_UID, $PM_CASE_ID, $PM_USER_UID, $PARENT_MSSQL_CASE_ID, $NEW_DOCUMENT_NUMBER);
-                $MSSQL_CASE_ID = $this->GET_MSSQL_CASE_ID($PROCESS_UID, $PM_CASE_ID, $PM_USER_UID, $CREATE_NEW_CASE_MODE, $PARENT_MSSQL_CASE_ID, $NEW_DOCUMENT_NUMBER);
+                $this->CREATE_MSSQL_NEW_CASE($PROCESS_UID, $PM_CASE_ID, $CASE_TYPE, $PM_USER_UID, $PARENT_MSSQL_CASE_ID, $NEW_DOCUMENT_NUMBER);
+                $MSSQL_CASE_ID = $this->GET_MSSQL_CASE_ID($PROCESS_UID, $PM_CASE_ID, $CASE_TYPE, $PM_USER_UID, $CREATE_NEW_CASE_MODE, $PARENT_MSSQL_CASE_ID, $NEW_DOCUMENT_NUMBER);
             }
         }else{
             $MSSQL_CASE_ID = $SELECT[0]["ID"];
@@ -76,14 +80,14 @@ class MSSQL_Database extends PDO {
         return $MSSQL_CASE_ID;
     }
 
-    public function GET_MSSQL_CASE_ID_AND_DOC_NUMBER($PROCESS_UID, $PM_CASE_ID, $PM_USER_UID, $SAYAC_ADI, $CREATE_NEW_CASE_MODE, $PARENT_MSSQL_CASE_ID = 0)
+    public function GET_MSSQL_CASE_ID_AND_DOC_NUMBER($PROCESS_UID, $PM_CASE_ID, $CASE_TYPE, $PM_USER_UID, $SAYAC_ADI, $CREATE_NEW_CASE_MODE, $PARENT_MSSQL_CASE_ID = 0)
     {
         $SAYAC_ADI = $this->functions->encoding->STR_UTF8_TO_MSSQL($SAYAC_ADI);
         $DOKUMAN_SAYAC = $this->Select("SELECT *FROM DOKUMAN_SAYAC WHERE SAYAC_ADI ='".$SAYAC_ADI."'");
         if($DOKUMAN_SAYAC){
             $NEW_DOCUMENT_NUMBER = $this->GENERATE_DOCUMENT_NUMBER($PM_CASE_ID, $DOKUMAN_SAYAC[0]["SAYAC_HARF"]);
             $this->ExecQuery("UPDATE DOKUMAN_SAYAC SET LAST = $PM_CASE_ID WHERE SAYAC_ADI = '$SAYAC_ADI'");
-            $MSSQL_CASE_ID = $this->GET_MSSQL_CASE_ID($PROCESS_UID, $PM_CASE_ID, $PM_USER_UID, $CREATE_NEW_CASE_MODE, $PARENT_MSSQL_CASE_ID, $NEW_DOCUMENT_NUMBER);
+            $MSSQL_CASE_ID = $this->GET_MSSQL_CASE_ID($PROCESS_UID, $PM_CASE_ID, $CASE_TYPE, $PM_USER_UID, $CREATE_NEW_CASE_MODE, $PARENT_MSSQL_CASE_ID, $NEW_DOCUMENT_NUMBER);
             $SONUC = array('DOC_NUMBER'=>$NEW_DOCUMENT_NUMBER, 'MSSQL_CASE_ID'=>$MSSQL_CASE_ID);
         } else {
             $SONUC = array('DOC_NUMBER'=>null, 'MSSQL_CASE_ID'=>null);

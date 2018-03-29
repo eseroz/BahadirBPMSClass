@@ -28,10 +28,14 @@ class BFunctions
     }
 
     public function post($par, $encode = false){
-        if($encode){
-            return $this->encoding->STR_UTF8_TO_MSSQL($_POST[$par]);
+        if(isset($_POST[$par])){
+            if($encode){
+                return $this->encoding->STR_UTF8_TO_MSSQL($_POST[$par]);
+            }else{
+                return $_POST[$par];
+            }
         }else{
-            return $_POST[$par];
+            return null;
         }
     }
 
