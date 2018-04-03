@@ -5,8 +5,8 @@ class BTypes{
 
     const TEKNIK_RESIM = "TEKNİK RESİM";
     const REFERANS_DOSYA = "REFERANS DOSYA";
-    const GUNCEL_DEGIL = "VAR";
-    const GUNCEL = "VAR";
+    //const GUNCEL_DEGIL = "VAR";
+    //const GUNCEL = "VAR";
     const YOK = "YOK";
     const UYGUN_DEGIL = "UYGUN DEĞİL";
     const UYGUN = "UYGUN";

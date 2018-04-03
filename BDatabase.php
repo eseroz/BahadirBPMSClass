@@ -41,13 +41,24 @@ class MSSQL_Database extends PDO {
             $rows[$i] = $row;
             $i++;
         }
-         if(odbc_errormsg()){
-            error_log("##################################################################################################");
+
+         if(odbc_error()){            
+            error_log("################################### START ERROR ##########################################");
+            error_log("------------------------------- START ERROR MESSAGE -------------------------------");
+            error_log(odbc_errormsg($this->mssqlCon));
+            error_log("------------------------------- END ERROR MESSAGE -------------------------------");
+            error_log("------------------------------- START SQL QUERY -------------------------------");
             error_log($sql);
-            error_log("##################################################################################################");
+            error_log("------------------------------- END SQL QUERY -------------------------------");
+            error_log("################################### END ERROR ##########################################");
         }
-        $UTF_8_ROWS = $this->functions->encoding->ARR_WALK_MSSQL_TO_UTF8($rows);
-        return $UTF_8_ROWS;
+
+        if(count($rows) > 0){
+            $UTF_8_ROWS = $this->functions->encoding->ARR_WALK_MSSQL_TO_UTF8($rows);
+            return $UTF_8_ROWS;
+        } else {
+            return $rows;
+        }
     }
 
     public function ExecQuery($sql){
@@ -304,7 +315,7 @@ class MSSQL_Database extends PDO {
         return $CASE["PM_CRT_USER_UID"];
     }
 
-    public function INSERT_UPLOAD_TEMP($CASE_ID,$UPLOAD_FILE, $ROW_INDEX, $TIP){
+    public function INSERT_UPLOAD_TEMP($CASE_ID,$UPLOAD_FILE, $ROW_INDEX, $TALEP_SATIR_ID, $TIP){
         if ( 0 < $UPLOAD_FILE['error'] ) {
             echo 'Error: ' . $UPLOAD_FILE['error'] . '<br>';
         } else {
@@ -315,7 +326,7 @@ class MSSQL_Database extends PDO {
             $DATA_STRING = file_get_contents($TMP_NAME);
             $DATA = unpack("H*hex", $DATA_STRING);
             $BINARY = "0x".$DATA['hex'];
-            $this->ExecQuery("INSERT INTO UPLOAD_TEMP (CASE_ID, FILE_CONTENT, FILE_NAME, FILE_TYPE, FILE_SIZE, ROW_INDEX, TIP) VALUES($CASE_ID,$BINARY,'$FILE_NAME','$FILE_TYPE','$FILE_SIZE','$ROW_INDEX','$TIP')");
+            $this->ExecQuery("INSERT INTO UPLOAD_TEMP (CASE_ID, FILE_CONTENT, FILE_NAME, FILE_TYPE, FILE_SIZE, ROW_INDEX, TALEP_SATIR_ID, TIP) VALUES($CASE_ID,$BINARY,'$FILE_NAME','$FILE_TYPE','$FILE_SIZE','$ROW_INDEX',$TALEP_SATIR_ID,'$TIP')");
         }
     }
 
